@@ -1,7 +1,8 @@
 package com.bricklink.fulfillment.shipstation.configuration;
 
-import com.bricklink.fulfillment.BricklinkFulfillmentException;
+import com.bricklink.fulfillment.ShipStationException;
 import com.bricklink.fulfillment.api.shipstation.*;
+import com.bricklink.fulfillment.shipstation.model.ShipStationError;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -16,10 +17,15 @@ import feign.jackson.JacksonDecoder;
 import feign.jackson.JacksonEncoder;
 import feign.okhttp.OkHttpClient;
 import feign.slf4j.Slf4jLogger;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+
+import java.io.IOException;
+import java.util.Optional;
 
 @Configuration
 @EnableConfigurationProperties(ShipStationProperties.class)
@@ -40,74 +46,74 @@ public class ShipStationConfiguration {
     }
 
     @Bean
-    public Accounts accounts(@Qualifier("shipStationObjectMapper") ObjectMapper shipStationObjectMapper, ShipStationProperties shipStationProperties) {
+    public AccountsAPI accounts(@Qualifier("shipStationObjectMapper") ObjectMapper shipStationObjectMapper, ShipStationProperties shipStationProperties) {
         return builder(shipStationObjectMapper, shipStationProperties)
-                .target(Accounts.class, shipStationProperties.getShipStation()
-                                                             .getBaseUrl());
+                .target(AccountsAPI.class, shipStationProperties.getShipStation()
+                                                                .getBaseUrl());
     }
 
     @Bean
-    public Carriers carriers(@Qualifier("shipStationObjectMapper") ObjectMapper shipStationObjectMapper, ShipStationProperties shipStationProperties) {
+    public CarriersAPI carriers(@Qualifier("shipStationObjectMapper") ObjectMapper shipStationObjectMapper, ShipStationProperties shipStationProperties) {
         return builder(shipStationObjectMapper, shipStationProperties)
-                .target(Carriers.class, shipStationProperties.getShipStation()
-                                                             .getBaseUrl());
+                .target(CarriersAPI.class, shipStationProperties.getShipStation()
+                                                                .getBaseUrl());
     }
 
     @Bean
-    public Customers customers(@Qualifier("shipStationObjectMapper") ObjectMapper shipStationObjectMapper, ShipStationProperties shipStationProperties) {
+    public CustomersAPI customers(@Qualifier("shipStationObjectMapper") ObjectMapper shipStationObjectMapper, ShipStationProperties shipStationProperties) {
         return builder(shipStationObjectMapper, shipStationProperties)
-                .target(Customers.class, shipStationProperties.getShipStation()
-                                                              .getBaseUrl());
-    }
-
-    @Bean
-    public Fulfillments fulfillments(@Qualifier("shipStationObjectMapper") ObjectMapper shipStationObjectMapper, ShipStationProperties shipStationProperties) {
-        return builder(shipStationObjectMapper, shipStationProperties)
-                .target(Fulfillments.class, shipStationProperties.getShipStation()
+                .target(CustomersAPI.class, shipStationProperties.getShipStation()
                                                                  .getBaseUrl());
     }
 
     @Bean
-    public Shipments shipments(@Qualifier("shipStationObjectMapper") ObjectMapper shipStationObjectMapper, ShipStationProperties shipStationProperties) {
+    public FulfillmentsAPI fulfillments(@Qualifier("shipStationObjectMapper") ObjectMapper shipStationObjectMapper, ShipStationProperties shipStationProperties) {
         return builder(shipStationObjectMapper, shipStationProperties)
-                .target(Shipments.class, shipStationProperties.getShipStation()
+                .target(FulfillmentsAPI.class, shipStationProperties.getShipStation()
+                                                                    .getBaseUrl());
+    }
+
+    @Bean
+    public ShipmentsAPI shipments(@Qualifier("shipStationObjectMapper") ObjectMapper shipStationObjectMapper, ShipStationProperties shipStationProperties) {
+        return builder(shipStationObjectMapper, shipStationProperties)
+                .target(ShipmentsAPI.class, shipStationProperties.getShipStation()
                                                                  .getBaseUrl());
     }
 
 
     @Bean
-    public Orders orders(@Qualifier("shipStationObjectMapper") ObjectMapper shipStationObjectMapper, ShipStationProperties shipStationProperties) {
+    public OrdersAPI orders(@Qualifier("shipStationObjectMapper") ObjectMapper shipStationObjectMapper, ShipStationProperties shipStationProperties) {
         return builder(shipStationObjectMapper, shipStationProperties)
-                .target(Orders.class, shipStationProperties.getShipStation()
+                .target(OrdersAPI.class, shipStationProperties.getShipStation()
                                                               .getBaseUrl());
     }
 
     @Bean
-    public Stores stores(@Qualifier("shipStationObjectMapper") ObjectMapper shipStationObjectMapper, ShipStationProperties shipStationProperties) {
+    public StoresAPI stores(@Qualifier("shipStationObjectMapper") ObjectMapper shipStationObjectMapper, ShipStationProperties shipStationProperties) {
         return builder(shipStationObjectMapper, shipStationProperties)
-                .target(Stores.class, shipStationProperties.getShipStation()
+                .target(StoresAPI.class, shipStationProperties.getShipStation()
                                                               .getBaseUrl());
     }
 
     @Bean
-    public Users users(@Qualifier("shipStationObjectMapper") ObjectMapper shipStationObjectMapper, ShipStationProperties shipStationProperties) {
+    public UsersAPI users(@Qualifier("shipStationObjectMapper") ObjectMapper shipStationObjectMapper, ShipStationProperties shipStationProperties) {
         return builder(shipStationObjectMapper, shipStationProperties)
-                .target(Users.class, shipStationProperties.getShipStation()
-                                                           .getBaseUrl());
+                .target(UsersAPI.class, shipStationProperties.getShipStation()
+                                                             .getBaseUrl());
     }
 
     @Bean
-    public Warehouses warehouses(@Qualifier("shipStationObjectMapper") ObjectMapper shipStationObjectMapper, ShipStationProperties shipStationProperties) {
+    public WarehousesAPI warehouses(@Qualifier("shipStationObjectMapper") ObjectMapper shipStationObjectMapper, ShipStationProperties shipStationProperties) {
         return builder(shipStationObjectMapper, shipStationProperties)
-                .target(Warehouses.class, shipStationProperties.getShipStation()
-                                                          .getBaseUrl());
+                .target(WarehousesAPI.class, shipStationProperties.getShipStation()
+                                                                  .getBaseUrl());
     }
 
     @Bean
-    public Webhooks webhooks(@Qualifier("shipStationObjectMapper") ObjectMapper shipStationObjectMapper, ShipStationProperties shipStationProperties) {
+    public WebhooksAPI webhooks(@Qualifier("shipStationObjectMapper") ObjectMapper shipStationObjectMapper, ShipStationProperties shipStationProperties) {
         return builder(shipStationObjectMapper, shipStationProperties)
-                .target(Webhooks.class, shipStationProperties.getShipStation()
-                                                               .getBaseUrl());
+                .target(WebhooksAPI.class, shipStationProperties.getShipStation()
+                                                                .getBaseUrl());
     }
 
     private Feign.Builder builder(@Qualifier("shipStationObjectMapper") ObjectMapper shipStationObjectMapper, ShipStationProperties shipStationProperties) {
@@ -123,27 +129,36 @@ public class ShipStationConfiguration {
                     .client(new OkHttpClient())
                     .encoder(new JacksonEncoder(shipStationObjectMapper))
                     .decoder(new JacksonDecoder(shipStationObjectMapper))
-                    .errorDecoder(new ShipStationErrorDecoder())
+                    .errorDecoder(new ShipStationErrorDecoder(shipStationObjectMapper))
                     .requestInterceptor(new BasicAuthRequestInterceptor(username, credential))
-                    .logger(new Slf4jLogger(Accounts.class))
+                    .logger(new Slf4jLogger(AccountsAPI.class))
                     .logLevel(feign.Logger.Level.FULL);
 
         }
         return builder;
     }
 
-    private class ShipStationErrorDecoder implements ErrorDecoder {
-        private final ErrorDecoder _default = new Default();
+    @RequiredArgsConstructor
+    @Slf4j
+    private static class ShipStationErrorDecoder implements ErrorDecoder {
+        private final ObjectMapper shipStationObjectMapper;
 
         @Override
         public Exception decode(String methodKey, Response response) {
-            if (response.status() >= 400 && response.status() <= 499) {
-                throw new BricklinkFulfillmentException(String.format("%d - %s", response.status(), response.reason()));
-            }
-            if (response.status() >= 500 && response.status() <= 599) {
-                throw new BricklinkFulfillmentException(String.format("%d - %s", response.status(), response.reason()));
-            }
-            return _default.decode(methodKey, response);
+            final ShipStationError shipStationError =
+                    Optional.ofNullable(response.body())
+                            .map(b -> {
+                                try {
+                                    return shipStationObjectMapper.readValue(b.asInputStream(), ShipStationError.class);
+                                } catch (IOException e) {
+                                    ShipStationError ssError = new ShipStationError();
+                                    ssError.setDeserializationErrorMessage(e.getMessage());
+                                    return ssError;
+                                }
+                            })
+                            .get();
+            log.error("ShipStation Error [{}]", shipStationError);
+            return new ShipStationException(shipStationError, String.format("%d - %s", response.status(), response.reason()));
         }
     }
 }

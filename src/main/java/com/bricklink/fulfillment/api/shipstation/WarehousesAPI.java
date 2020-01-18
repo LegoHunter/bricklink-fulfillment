@@ -1,4 +1,4 @@
 package com.bricklink.fulfillment.api.shipstation;
 
-public interface Users {
+public interface WarehousesAPI {
 }

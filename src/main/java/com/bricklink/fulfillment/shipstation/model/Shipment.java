@@ -3,6 +3,7 @@ package com.bricklink.fulfillment.shipstation.model;
 import com.fasterxml.jackson.annotation.JsonRootName;
 import lombok.*;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 
@@ -18,10 +19,10 @@ public class Shipment {
     private String userId;
     private String customerEmail;
     private String trackingNumber;
-    private Date createDate;
+    private LocalDateTime createDate;
     private Date shipDate;
-    private Date voidDate;
-    private Date deliveryDate;
+    private LocalDateTime voidDate;
+    private LocalDateTime deliveryDate;
     private String carrierCode;
     private String fulfillmentProviderCode;
     private String fulfillmentServiceCode;

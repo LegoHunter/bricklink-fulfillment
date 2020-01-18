@@ -5,7 +5,7 @@ import feign.RequestLine;
 
 import java.util.List;
 
-public interface Accounts {
+public interface AccountsAPI {
     @RequestLine("GET /accounts/listtags")
     List<Tag> listTags();
 }

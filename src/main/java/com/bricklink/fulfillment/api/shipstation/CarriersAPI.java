@@ -1,14 +1,14 @@
 package com.bricklink.fulfillment.api.shipstation;
 
-import com.bricklink.fulfillment.shipstation.model.Package;
 import com.bricklink.fulfillment.shipstation.model.Carrier;
+import com.bricklink.fulfillment.shipstation.model.Package;
 import com.bricklink.fulfillment.shipstation.model.Service;
 import feign.Param;
 import feign.RequestLine;
 
 import java.util.List;
 
-public interface Carriers {
+public interface CarriersAPI {
     @RequestLine("GET /carriers")
     List<Carrier> getCarriers();
 

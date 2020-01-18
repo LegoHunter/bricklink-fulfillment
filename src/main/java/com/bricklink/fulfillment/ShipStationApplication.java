@@ -17,7 +17,6 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.function.BiConsumer;
-import java.util.function.Consumer;
 
 @Slf4j
 @SpringBootApplication
@@ -36,30 +35,30 @@ public class ShipStationApplication {
     @RequiredArgsConstructor
     private class ShipStationTest implements ApplicationRunner {
         private final ShipStationProperties shipStationProperties;
-        private final Carriers carriersService;
-        private final Accounts accountsService;
-        private final Customers customerService;
-        private final Fulfillments fulfillmentService;
-        private final Shipments shipmentService;
-        private final Orders orderService;
+        private final CarriersAPI carriersAPIService;
+        private final AccountsAPI accountsAPIService;
+        private final CustomersAPI customerService;
+        private final FulfillmentsAPI fulfillmentService;
+        private final ShipmentsAPI shipmentService;
+        private final OrdersAPI orderService;
 
         @Override
         public void run(ApplicationArguments args) throws Exception {
             log.info("ShipStation properties [{}]", shipStationProperties);
 
-            List<Tag> tags = accountsService.listTags();
+            List<Tag> tags = accountsAPIService.listTags();
             listLogger.accept("Tags", tags);
 
-            List<Carrier> carriers = carriersService.getCarriers();
+            List<Carrier> carriers = carriersAPIService.getCarriers();
             listLogger.accept("Carriers", carriers);
 
-            Carrier carrier = carriersService.getCarrier("stamps_com");
+            Carrier carrier = carriersAPIService.getCarrier("stamps_com");
             log.info("carrier [{}]", carrier);
 
-            List<Package> packages = carriersService.getPackages("stamps_com");
+            List<Package> packages = carriersAPIService.getPackages("stamps_com");
             listLogger.accept("Packages", packages);
 
-            List<Service> services = carriersService.getServices("stamps_com");
+            List<Service> services = carriersAPIService.getServices("stamps_com");
             listLogger.accept("Services", services);
 
             CustomersList customers = customerService.getCustomers(new ParamsBuilder().get());

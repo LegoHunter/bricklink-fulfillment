@@ -6,7 +6,7 @@ import feign.RequestLine;
 
 import java.util.Map;
 
-public interface Shipments {
+public interface ShipmentsAPI {
     @RequestLine("GET /shipments")
     ShipmentList getShipments();
 

@@ -3,8 +3,7 @@ package com.bricklink.fulfillment.shipstation.model;
 import com.fasterxml.jackson.annotation.JsonRootName;
 import lombok.*;
 
-import java.time.Instant;
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
@@ -14,8 +13,8 @@ import java.util.List;
 @ToString
 public class Customer {
     private Long customerId;
-    private Date createDate;
-    private Date modifyDate;
+    private LocalDateTime createDate;
+    private LocalDateTime modifyDate;
     private String name;
     private String company;
     private String street1;
@@ -36,8 +35,8 @@ public class Customer {
     public static class MarketplaceUsername {
         private String customerUserId;
         private Long customerId;
-        private Date createDate;
-        private Date modifyDate;
+        private LocalDateTime createDate;
+        private LocalDateTime modifyDate;
         private Integer marketplaceId;
         private String marketplace;
         private String username;

@@ -6,10 +6,9 @@ import feign.Param;
 import feign.QueryMap;
 import feign.RequestLine;
 
-import java.util.List;
 import java.util.Map;
 
-public interface Customers {
+public interface CustomersAPI {
     @RequestLine("GET /customers?stateCode={stateCode}&countryCode={countryCode}&tagId={tagId}&marketplaceId={marketplaceId}&sortBy={sortBy}&sortDir={sortDir}&page={page}&pageSize={pageSize}")
     CustomersList getCustomers(@QueryMap Map<String, Object> params);
 
