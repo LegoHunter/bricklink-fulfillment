@@ -1,13 +1,14 @@
 package com.bricklink.fulfillment.api.shipstation;
 
-import com.bricklink.fulfillment.shipstation.model.Order;
-import com.bricklink.fulfillment.shipstation.model.Order.OrdersList;
+import com.bricklink.fulfillment.shipstation.model.ShipStationOrder;
 import feign.Headers;
 import feign.Param;
 import feign.QueryMap;
 import feign.RequestLine;
 
 import java.util.Map;
+
+import static com.bricklink.fulfillment.shipstation.model.ShipStationOrder.OrdersList;
 
 public interface OrdersAPI {
     @RequestLine("GET /orders")
@@ -17,9 +18,9 @@ public interface OrdersAPI {
     OrdersList getOrders(@QueryMap Map<String, Object> params);
 
     @RequestLine("GET /orders/{orderId}")
-    Order getOrder(@Param("orderId") Long orderId);
+    ShipStationOrder getOrder(@Param("orderId") Long orderId);
 
     @RequestLine("POST /orders/createorder")
     @Headers("Content-Type: application/json")
-    Order createOrUpdateOrder(Order order);
+    ShipStationOrder createOrUpdateOrder(ShipStationOrder order);
 }

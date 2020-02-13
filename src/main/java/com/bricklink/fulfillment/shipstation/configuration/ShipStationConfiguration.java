@@ -1,7 +1,19 @@
 package com.bricklink.fulfillment.shipstation.configuration;
 
 import com.bricklink.fulfillment.ShipStationException;
-import com.bricklink.fulfillment.api.shipstation.*;
+import com.bricklink.fulfillment.api.ReferenceService;
+import com.bricklink.fulfillment.api.bricklink.ReferenceServiceImpl;
+import com.bricklink.fulfillment.api.shipstation.AccountsAPI;
+import com.bricklink.fulfillment.api.shipstation.CarriersAPI;
+import com.bricklink.fulfillment.api.shipstation.CustomersAPI;
+import com.bricklink.fulfillment.api.shipstation.FulfillmentsAPI;
+import com.bricklink.fulfillment.api.shipstation.OrdersAPI;
+import com.bricklink.fulfillment.api.shipstation.ShipStationOrderService;
+import com.bricklink.fulfillment.api.shipstation.ShipmentsAPI;
+import com.bricklink.fulfillment.api.shipstation.StoresAPI;
+import com.bricklink.fulfillment.api.shipstation.UsersAPI;
+import com.bricklink.fulfillment.api.shipstation.WarehousesAPI;
+import com.bricklink.fulfillment.api.shipstation.WebhooksAPI;
 import com.bricklink.fulfillment.shipstation.model.ShipStationError;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.DeserializationFeature;
@@ -28,7 +40,7 @@ import java.io.IOException;
 import java.util.Optional;
 
 @Configuration
-@EnableConfigurationProperties(ShipStationProperties.class)
+@EnableConfigurationProperties({ReferenceProperties.class, ShipStationProperties.class})
 public class ShipStationConfiguration {
 
     private Feign.Builder builder;
@@ -43,6 +55,16 @@ public class ShipStationConfiguration {
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
         return mapper;
+    }
+
+    @Bean
+    public ShipStationOrderService shipStationOrderService(OrdersAPI ordersApi) {
+        return new ShipStationOrderService(ordersApi);
+    }
+
+    @Bean
+    public ReferenceService referenceService(ReferenceProperties referenceProperties, ObjectMapper objectMapper) {
+        return new ReferenceServiceImpl(referenceProperties, objectMapper);
     }
 
     @Bean
