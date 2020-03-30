@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Optional;
 
 @Data
 @Builder
@@ -87,12 +87,39 @@ public class ShipStationOrder {
         internationalOptions.setCustomsItems(customsItems);
     }
 
-    public InsuranceOptions getInsuranceOptions() {
+    public void createInsuranceOptions() {
         insuranceOptions = new InsuranceOptions();
         insuranceOptions.setProvider("shipsurance");
         insuranceOptions.setInsureShipment(true);
         insuranceOptions.setInsuredValue(Math.ceil(getOrderTotal() - getShippingAmount()));
-        return insuranceOptions;
+    }
+
+    @JsonIgnore
+    public boolean isPaid() {
+        return OrderStatus.valueOf(this.getOrderStatus().toUpperCase()).compareTo(OrderStatus.AWAITING_SHIPMENT) >= 0;
+    }
+
+    @JsonIgnore
+    public boolean isNotPaid() {
+        return !this.isPaid();
+    }
+
+    @JsonIgnore
+    public boolean isShipped() {
+        return OrderStatus.valueOf(this.getOrderStatus().toUpperCase()).compareTo(OrderStatus.SHIPPED) >= 0;
+    }
+
+    @JsonIgnore
+    public boolean isNotShipped() {
+        return !this.isShipped();
+    }
+
+    public void updateStatusToPaid(Date paymentDate, Double amountPaid) {
+        if (isNotPaid()) {
+            setPaymentDate(Optional.ofNullable(this.getPaymentDate()).orElse(Optional.ofNullable(paymentDate).orElse(new Date())));
+            setOrderStatus(OrderStatus.AWAITING_SHIPMENT.label);
+            setAmountPaid(amountPaid);
+        }
     }
 
     @Data

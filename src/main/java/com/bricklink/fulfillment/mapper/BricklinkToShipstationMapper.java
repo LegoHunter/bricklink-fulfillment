@@ -3,6 +3,7 @@ package com.bricklink.fulfillment.mapper;
 import com.bricklink.api.rest.model.v1.Cost;
 import com.bricklink.api.rest.model.v1.Item;
 import com.bricklink.api.rest.model.v1.Order;
+import com.bricklink.api.rest.model.v1.Payment;
 import com.bricklink.fulfillment.BricklinkFulfillmentException;
 import com.bricklink.fulfillment.api.ReferenceService;
 import com.bricklink.fulfillment.api.bricklink.BricklinkOrderService;
@@ -11,6 +12,7 @@ import com.bricklink.fulfillment.shipstation.model.Country;
 import com.bricklink.fulfillment.shipstation.model.OrderItem;
 import com.bricklink.fulfillment.shipstation.model.ShipStationOrder;
 import com.bricklink.fulfillment.shipstation.model.Weight;
+import com.bricklink.util.DateUtils;
 import com.flickr4java.flickr.FlickrException;
 import com.flickr4java.flickr.photos.Photo;
 import com.flickr4java.flickr.photos.PhotosInterface;
@@ -25,7 +27,6 @@ import org.apache.commons.text.StringEscapeUtils;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.Normalizer;
-import java.time.ZoneId;
 import java.util.Date;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
@@ -44,6 +45,7 @@ public class BricklinkToShipstationMapper {
     private final BricklinkOrderService bricklinkOrderService;
     private final ReferenceService referenceService;
     public Function<com.bricklink.api.rest.model.v1.Address, Address> addressMapper = ba -> {
+        log.debug("Mapping Bricklink Address [{}] to ShipStation", ba);
         Address shipStationAddress = new Address();
         shipStationAddress.setName(accentStripper.apply(ba
                 .getName()
@@ -59,11 +61,10 @@ public class BricklinkToShipstationMapper {
     };
 
     public BiConsumer<Order, ShipStationOrder> bricklinkToShipstationOrderMapper = (bricklinkOrder, shipStationOrder) -> {
+        log.debug("Mapping Bricklink Order [{}] to ShipStation", bricklinkOrder);
         shipStationOrder.setOrderNumber(String.format("BL-%s", bricklinkOrder.getOrder_id()));
         shipStationOrder.setOrderKey(shipStationOrder.getOrderNumber());
-        shipStationOrder.setOrderDate(Date.from(bricklinkOrder.getDate_ordered()
-                                                              .atZone(ZoneId.of("America/Los_Angeles"))
-                                                              .toInstant()));
+        shipStationOrder.setOrderDate(DateUtils.toDate(bricklinkOrder.getDate_ordered()));
         shipStationOrder.setOrderStatus(AWAITING_PAYMENT.label);
         shipStationOrder.setCustomerUsername(bricklinkOrder.getBuyer_name());
         shipStationOrder.setCustomerEmail(bricklinkOrder.getBuyer_email());
@@ -78,6 +79,14 @@ public class BricklinkToShipstationMapper {
         Double shippingAmount = cost.getShipping() + cost.getInsurance();
         shipStationOrder.setShippingAmount(shippingAmount);
         shipStationOrder.setInternalNotes(bricklinkOrder.getRemarks());
+
+        if (bricklinkOrder.isPaid()) {
+            Payment payment = bricklinkOrder.getPayment();
+            Date paymentDate = DateUtils.toDate(payment.getDate_paid());
+            Double grandTotal = cost.getGrand_total();
+            log.info("\tBricklink Order is Paid, updating ShipStation order date [{}] and total payment [{}]", paymentDate, grandTotal);
+            shipStationOrder.updateStatusToPaid(paymentDate, grandTotal);
+        }
     };
 
     public Function<com.bricklink.api.rest.model.v1.OrderItem, OrderItem> bricklinkToShipstationOrderItemMapper = bricklinkOrderItem -> {
@@ -94,6 +103,7 @@ public class BricklinkToShipstationMapper {
         shipStationOrderItem.setUnitPrice(bricklinkOrderItem.getUnit_price());
         shipStationOrderItem.setUpc(bricklinkOrderItem.getItem()
                                                       .getNo());
+        log.debug("Mapping Bricklink OrderItem [{}] to ShipStation OrderItem [{}]", bricklinkOrderItem, shipStationOrderItem);
         return shipStationOrderItem;
     };
 
@@ -116,7 +126,9 @@ public class BricklinkToShipstationMapper {
             Photo photo = photosInterface.getPhoto(albumManifest.getPrimaryPhoto()
                                                                 .getPhotoId());
             try {
-                shipStationOrderitem.setImageUrl(new URL(photo.getSquareLargeUrl()).toExternalForm());
+                String photoUrl = new URL(photo.getSquareLargeUrl()).toExternalForm();
+                log.debug("Setting ShipStation OrderItem url to [{}]", photoUrl);
+                shipStationOrderitem.setImageUrl(photoUrl);
             } catch (MalformedURLException e) {
                 shipStationOrderitem.setImageUrl(null);
             }

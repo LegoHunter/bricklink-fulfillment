@@ -9,6 +9,8 @@ public interface OrderService<T, U> {
 
     List<U> getOrderItems(String orderId);
 
+    T markShipped(T t);
+
     boolean isDomestic(T order);
 
     default String getService(T t) {

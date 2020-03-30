@@ -58,8 +58,8 @@ public class ShipStationConfiguration {
     }
 
     @Bean
-    public ShipStationOrderService shipStationOrderService(OrdersAPI ordersApi) {
-        return new ShipStationOrderService(ordersApi);
+    public ShipStationOrderService shipStationOrderService(OrdersAPI ordersApi, ShipmentsAPI shipmentsApi) {
+        return new ShipStationOrderService(ordersApi, shipmentsApi);
     }
 
     @Bean
