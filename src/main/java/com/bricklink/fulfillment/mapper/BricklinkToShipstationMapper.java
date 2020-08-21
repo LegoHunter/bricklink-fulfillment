@@ -113,32 +113,38 @@ public class BricklinkToShipstationMapper {
 
     public OrderItem addOrderItem(com.bricklink.api.rest.model.v1.OrderItem bricklinkOrderItem, ShipStationOrder shipStationOrder) {
 
-        // Find Bricklink Inventory from database using Inventory Id.
-        Long inventoryId = bricklinkOrderItem.getInventory_id();
-        BricklinkInventory bricklinkInventory = bricklinkInventoryDao.getByInventoryId(inventoryId)
-                                                                     .orElseThrow(() -> new BricklinkFulfillmentException(String.format("Unable to find inventory_id [%s] in bricklink_inventory table", inventoryId)));
-
         OrderItem shipStationOrderitem = bricklinkToShipstationOrderItemMapper.apply(bricklinkOrderItem);
 
-        // Set the OrderItem image URL from Flickr
-        AlbumManifest albumManifest = albumManager.getAlbumManifest(bricklinkInventory.getUuid(), bricklinkInventory.getBlItemNo());
-        try {
-            Photo photo = photosInterface.getPhoto(albumManifest.getPrimaryPhoto()
-                                                                .getPhotoId());
-            try {
-                String photoUrl = new URL(photo.getSquareLargeUrl()).toExternalForm();
-                log.debug("Setting ShipStation OrderItem url to [{}]", photoUrl);
-                shipStationOrderitem.setImageUrl(photoUrl);
-            } catch (MalformedURLException e) {
-                shipStationOrderitem.setImageUrl(null);
-            }
-        } catch (FlickrException e) {
-            throw new BricklinkFulfillmentException(e);
-        }
+        // For a SET, pull information from the database and the primary image from Flickr
+        if (bricklinkOrderItem.getItem().getType().equals("SET")) {
+            // Find Bricklink Inventory from database using Inventory Id.
+            Long inventoryId = bricklinkOrderItem.getInventory_id();
+            BricklinkInventory bricklinkInventory = bricklinkInventoryDao.getByInventoryId(inventoryId)
+                                                                         .orElseThrow(() -> new BricklinkFulfillmentException(String.format("Unable to find inventory_id [%s] in bricklink_inventory table", inventoryId)));
 
-        // Set remaining fields
-        shipStationOrderitem.setSku(bricklinkInventory.getUuid());
-        shipStationOrderitem.setWarehouseLocation(String.format("%02d-%03d", bricklinkInventory.getBoxId(), bricklinkInventory.getBoxIndex()));
+            // Set the OrderItem image URL from Flickr
+            AlbumManifest albumManifest = albumManager.getAlbumManifest(bricklinkInventory.getUuid(), bricklinkInventory.getBlItemNo());
+            try {
+                Photo photo = photosInterface.getPhoto(albumManifest.getPrimaryPhoto()
+                                                                    .getPhotoId());
+                try {
+                    String photoUrl = new URL(photo.getSquareLargeUrl()).toExternalForm();
+                    log.debug("Setting ShipStation OrderItem url to [{}]", photoUrl);
+                    shipStationOrderitem.setImageUrl(photoUrl);
+                } catch (MalformedURLException e) {
+                    shipStationOrderitem.setImageUrl(null);
+                }
+            } catch (FlickrException e) {
+                throw new BricklinkFulfillmentException(e);
+            }
+
+            // Set remaining fields
+            shipStationOrderitem.setSku(bricklinkInventory.getUuid());
+            shipStationOrderitem.setWarehouseLocation(String.format("%02d-%03d", bricklinkInventory.getBoxId(), bricklinkInventory.getBoxIndex()));
+        } else {
+            // For a PART, add information directly from the bricklinkOrderItem
+            shipStationOrderitem.setSku(bricklinkOrderItem.getItem().getNo());
+        }
         shipStationOrder.getShipStationOrderItems()
                         .add(shipStationOrderitem);
         return shipStationOrderitem;
