@@ -1,8 +1,10 @@
 package com.bricklink.fulfillment.shipstation.model;
 
 import com.bricklink.util.DateUtils;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonRootName;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -28,9 +30,10 @@ public class Shipment {
     private String trackingNumber;
     private LocalDateTime createDate;
     private Date shipDate;
+    private LocalDateTime voidDate;
     @JsonDeserialize(using = DateUtils.ZonedDateTimeDeserializer.class)
-    private ZonedDateTime voidDate;
-    @JsonDeserialize(using = DateUtils.ZonedDateTimeDeserializer.class)
+    @JsonSerialize(using = DateUtils.ZonedDateTimeSerializer.class)
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSSSSS", timezone = "UTC")
     private ZonedDateTime deliveryDate;
     private String carrierCode;
     private String fulfillmentProviderCode;

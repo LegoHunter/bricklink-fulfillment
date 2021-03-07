@@ -72,6 +72,7 @@ public class ShipStationOrderService implements OrderService<ShipStationOrder, O
                                                                                        .get());
         return shipments.getShipments()
                         .stream()
+                        .filter(s -> s.getVoided().equals(Boolean.FALSE))
                         .map(s -> Tracking.builder()
                                           .trackingNumber(s.getTrackingNumber())
                                           .dateShipped(DateUtils.toZonedDateTime(s.getCreateDate()))

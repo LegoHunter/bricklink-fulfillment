@@ -32,6 +32,7 @@ import java.util.function.BiConsumer;
 import java.util.function.Function;
 
 import static com.bricklink.fulfillment.shipstation.model.OrderStatus.AWAITING_PAYMENT;
+import static com.bricklink.fulfillment.shipstation.model.OrderStatus.CANCELLED;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -65,7 +66,7 @@ public class BricklinkToShipstationMapper {
         shipStationOrder.setOrderNumber(String.format("BL-%s", bricklinkOrder.getOrder_id()));
         shipStationOrder.setOrderKey(shipStationOrder.getOrderNumber());
         shipStationOrder.setOrderDate(DateUtils.toDate(bricklinkOrder.getDate_ordered()));
-        shipStationOrder.setOrderStatus(AWAITING_PAYMENT.label);
+        shipStationOrder.setOrderStatus(bricklinkOrder.isCancelled()? CANCELLED.label : AWAITING_PAYMENT.label);
         shipStationOrder.setCustomerUsername(bricklinkOrder.getBuyer_name());
         shipStationOrder.setCustomerEmail(bricklinkOrder.getBuyer_email());
         shipStationOrder.setBillTo(addressMapper.apply(bricklinkOrder.getShipping()

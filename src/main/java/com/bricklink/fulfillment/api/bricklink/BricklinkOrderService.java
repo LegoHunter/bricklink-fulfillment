@@ -56,6 +56,12 @@ public class BricklinkOrderService implements OrderService<Order, OrderItem> {
         List<Order> packedOrders = ordersResource.getData();
         orders.addAll(packedOrders);
 
+        ordersResource = bricklinkRestClient.getOrders(new ParamsBuilder().of("direction", "in")
+                                                                          .of("filed", false)
+                                                                          .get(), Arrays.asList("Cancelled"));
+        List<Order> cancelledOrders = ordersResource.getData();
+        orders.addAll(cancelledOrders);
+
         return orders;
     }
 
