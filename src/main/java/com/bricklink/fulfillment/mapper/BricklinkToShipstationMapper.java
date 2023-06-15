@@ -16,6 +16,7 @@ import com.bricklink.util.DateUtils;
 import com.flickr4java.flickr.FlickrException;
 import com.flickr4java.flickr.photos.Photo;
 import com.flickr4java.flickr.photos.PhotosInterface;
+import com.vattima.lego.imaging.LegoImagingException;
 import com.vattima.lego.imaging.model.AlbumManifest;
 import com.vattima.lego.imaging.service.AlbumManager;
 import lombok.RequiredArgsConstructor;
@@ -28,6 +29,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.Normalizer;
 import java.util.Date;
+import java.util.Optional;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 
@@ -126,15 +128,22 @@ public class BricklinkToShipstationMapper {
             // Set the OrderItem image URL from Flickr
             AlbumManifest albumManifest = albumManager.getAlbumManifest(bricklinkInventory.getUuid(), bricklinkInventory.getBlItemNo());
             try {
-                Photo photo = photosInterface.getPhoto(albumManifest.getPrimaryPhoto()
-                                                                    .getPhotoId());
+                Photo photo = null;
                 try {
-                    String photoUrl = new URL(photo.getSquareLargeUrl()).toExternalForm();
-                    log.debug("Setting ShipStation OrderItem url to [{}]", photoUrl);
-                    shipStationOrderitem.setImageUrl(photoUrl);
-                } catch (MalformedURLException e) {
-                    shipStationOrderitem.setImageUrl(null);
+                    photo = photosInterface.getPhoto(albumManifest.getPrimaryPhoto()
+                                                                        .getPhotoId());
+                } catch (LegoImagingException e) {
+                    log.warn("Unable to get primary photo for BricklinkInventory UUID [{}] Bricklink Item Number [{}] - error [{}]", bricklinkInventory.getUuid(), bricklinkInventory.getBlItemNo(), e.getMessage());
                 }
+                Optional.ofNullable(photo).ifPresentOrElse(p -> {
+                    try {
+                        String photoUrl = new URL(p.getSquareLargeUrl()).toExternalForm();
+                        log.debug("Setting ShipStation OrderItem url to [{}]", photoUrl);
+                        shipStationOrderitem.setImageUrl(photoUrl);
+                    } catch (MalformedURLException e) {
+                        shipStationOrderitem.setImageUrl(null);
+                    }
+                }, () -> shipStationOrderitem.setImageUrl(null));
             } catch (FlickrException e) {
                 throw new BricklinkFulfillmentException(e);
             }
