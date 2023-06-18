@@ -19,6 +19,6 @@ public interface ReferenceService {
                                 .stream()
                                 .filter(c -> c.hasCode(code))
                                 .findFirst()
-                                .orElseThrow(() -> new BricklinkFulfillmentException(String.format("Country code [%s] not found", code)));
+                                .orElseThrow(() -> new BricklinkFulfillmentException("Country code [%s] not found".formatted(code)));
     }
 }

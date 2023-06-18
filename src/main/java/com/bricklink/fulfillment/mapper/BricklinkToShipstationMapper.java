@@ -123,7 +123,7 @@ public class BricklinkToShipstationMapper {
             // Find Bricklink Inventory from database using Inventory Id.
             Long inventoryId = bricklinkOrderItem.getInventory_id();
             BricklinkInventory bricklinkInventory = bricklinkInventoryDao.getByInventoryId(inventoryId)
-                                                                         .orElseThrow(() -> new BricklinkFulfillmentException(String.format("Unable to find inventory_id [%s] in bricklink_inventory table", inventoryId)));
+                                                                         .orElseThrow(() -> new BricklinkFulfillmentException("Unable to find inventory_id [%s] in bricklink_inventory table".formatted(inventoryId)));
 
             // Set the OrderItem image URL from Flickr
             AlbumManifest albumManifest = albumManager.getAlbumManifest(bricklinkInventory.getUuid(), bricklinkInventory.getBlItemNo());
@@ -150,7 +150,7 @@ public class BricklinkToShipstationMapper {
 
             // Set remaining fields
             shipStationOrderitem.setSku(bricklinkInventory.getUuid());
-            shipStationOrderitem.setWarehouseLocation(String.format("%02d-%03d", bricklinkInventory.getBoxId(), bricklinkInventory.getBoxIndex()));
+            shipStationOrderitem.setWarehouseLocation("%02d-%03d".formatted(bricklinkInventory.getBoxId(), bricklinkInventory.getBoxIndex()));
         } else {
             // For a PART, add information directly from the bricklinkOrderItem
             shipStationOrderitem.setSku(bricklinkOrderItem.getItem().getNo());

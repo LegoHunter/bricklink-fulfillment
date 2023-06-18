@@ -36,7 +36,7 @@ public class ShipStationOrderService implements OrderService<ShipStationOrder, O
     public ShipStationOrder getOrder(String orderId) {
         ShipStationOrder order;
         // Find existing Shipstation order (if it exists)
-        OrdersList shipStationOrders = ordersAPI.getOrders(new ParamsBuilder().of("orderNumber", String.format("BL-%s", orderId))
+        OrdersList shipStationOrders = ordersAPI.getOrders(new ParamsBuilder().of("orderNumber", "BL-%s".formatted(orderId))
                                                                               .get());
         int orderCount = shipStationOrders.getOrders()
                                           .size();
@@ -47,7 +47,7 @@ public class ShipStationOrderService implements OrderService<ShipStationOrder, O
             order = shipStationOrders.getOrders()
                                      .get(0);
         } else {
-            throw new BricklinkFulfillmentException(String.format("Found [%d] orders for order number [%s] in Shipstation", orderCount, String.format("BL-%s", orderId)));
+            throw new BricklinkFulfillmentException("Found [%d] orders for order number [%s] in Shipstation".formatted(orderCount, "BL-%s".formatted(orderId)));
         }
         return order;
     }
@@ -86,9 +86,9 @@ public class ShipStationOrderService implements OrderService<ShipStationOrder, O
         try {
             URL url = null;
             if (isDomestic(shipStationOrder)) {
-                url = new URL(String.format(DOMESTIC_TRACKING_URL, trackingNumber));
+                url = new URL(DOMESTIC_TRACKING_URL.formatted(trackingNumber));
             } else {
-                url = new URL(String.format(INTERNATIONAL_TRACKING_URL, trackingNumber));
+                url = new URL(INTERNATIONAL_TRACKING_URL.formatted(trackingNumber));
             }
             return url;
         } catch (MalformedURLException e) {

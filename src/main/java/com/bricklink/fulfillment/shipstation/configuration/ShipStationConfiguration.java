@@ -180,7 +180,7 @@ public class ShipStationConfiguration {
                             })
                             .get();
             log.error("ShipStation Error [{}]", shipStationError);
-            return new ShipStationException(shipStationError, String.format("%d - %s", response.status(), response.reason()));
+            return new ShipStationException(shipStationError, "%d - %s".formatted(response.status(), response.reason()));
         }
     }
 }
