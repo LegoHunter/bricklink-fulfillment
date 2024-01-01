@@ -65,7 +65,7 @@ public class BricklinkToShipstationMapper {
 
     public BiConsumer<Order, ShipStationOrder> bricklinkToShipstationOrderMapper = (bricklinkOrder, shipStationOrder) -> {
         log.debug("Mapping Bricklink Order [{}] to ShipStation", bricklinkOrder);
-        shipStationOrder.setOrderNumber(String.format("BL-%s", bricklinkOrder.getOrder_id()));
+        shipStationOrder.setOrderNumber("BL-%s".formatted(bricklinkOrder.getOrder_id()));
         shipStationOrder.setOrderKey(shipStationOrder.getOrderNumber());
         shipStationOrder.setOrderDate(DateUtils.toDate(bricklinkOrder.getDate_ordered()));
         shipStationOrder.setOrderStatus(bricklinkOrder.isCancelled()? CANCELLED.label : AWAITING_PAYMENT.label);
@@ -96,7 +96,7 @@ public class BricklinkToShipstationMapper {
         Item item = bricklinkOrderItem.getItem();
         OrderItem shipStationOrderItem = new OrderItem();
         shipStationOrderItem.setLineItemKey(null);
-        shipStationOrderItem.setName(String.format("(%s) - %s", item.getNo(), StringEscapeUtils.unescapeHtml4(item.getName())));
+        shipStationOrderItem.setName("(%s) - %s".formatted(item.getNo(), StringEscapeUtils.unescapeHtml4(item.getName())));
 
         Weight weight = new Weight();
         weight.setUnits("grams");
