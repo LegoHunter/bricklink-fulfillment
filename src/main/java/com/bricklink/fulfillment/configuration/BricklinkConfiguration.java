@@ -1,7 +1,6 @@
 package com.bricklink.fulfillment.configuration;
 
 import com.bricklink.api.rest.client.BricklinkRestClient;
-import com.bricklink.fulfillment.api.OrderService;
 import com.bricklink.fulfillment.api.ReferenceService;
 import com.bricklink.fulfillment.api.bricklink.BricklinkOrderService;
 import com.bricklink.fulfillment.api.shipstation.OrdersAPI;
