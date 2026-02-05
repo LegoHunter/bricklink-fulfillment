@@ -58,7 +58,7 @@ lego:
     keywords-key-name: "Keywords:"
 
 shipstation:
-  client-config-dir: C:\Users\tvatt\.credentials\shipstation.api
+  client-config-dir: D:\dev\config\shipstation.api
   client-config-file: shipstation-client-config.json
 
 flickr:
@@ -69,7 +69,7 @@ flickr:
   debug-stream: false
 
 bitly:
-  client-config-dir: C:\Users\tvatt\.credentials\bitly.api
+  client-config-dir: D:\dev\config\bitly.api
   client-config-file: bitly-client-api-keys.json
 
 mybatis:
